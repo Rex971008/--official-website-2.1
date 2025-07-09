@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外送沒人幫 - 官方網站</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* [CSS 樣式與上一版完全相同，此處省略以節省篇幅] */
+        :root { --bg-color: #121212; --surface-color: #1e1e1e; --primary-color: #f0c419; --primary-gradient: linear-gradient(135deg, #c5a22d, #f0c419, #ffec8a); --text-color: #e0e0e0; --text-secondary-color: #a0a0a0; --font-main: 'Noto Sans TC', sans-serif; --border-radius: 12px; --container-width: 1100px; --shadow: 0 10px 30px rgba(0,0,0,0.5); --sidebar-width-desktop: 280px; --sidebar-width-mobile: 80vw; --sidebar-bg: #1a1a1a; --sidebar-link-hover-bg: rgba(240, 196, 25, 0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-main); background-color: var(--bg-color); color: var(--text-color); line-height: 1.7; overflow-x: hidden; position: relative; overflow-y: scroll; }
+        body.sidebar-open, body.modal-open { overflow: hidden; }
+        .page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        main { flex-grow: 1; }
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 2rem; }
+        section { padding: 6rem 0; position: relative; z-index: 2; }
+        .section-title { font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 1rem; color: #fff; position: relative; display: inline-block; }
+        .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: var(--primary-gradient); border-radius: 2px; }
+        .section-subtitle { text-align: center; color: var(--text-secondary-color); margin-bottom: 4rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+        .hero-background { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 0; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=2881&auto=format&fit=crop'); background-size: cover; background-position: center; }
+        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff; position: relative; background-color: transparent; }
+        .hero-content { max-width: 800px; padding: 0 1rem; z-index: 1; }
+        .hero h1 { font-size: 4.5rem; font-weight: 700; margin-bottom: 1rem; letter-spacing: 2px; }
+        .hero p { font-size: 1.5rem; font-weight: 300; color: var(--text-secondary-color); margin-bottom: 2rem; }
+        .cta-button { display: inline-block; padding: 1rem 2.5rem; background: var(--primary-gradient); color: #000; text-decoration: none; font-weight: 700; border-radius: 50px; transition: transform 0.3s ease, box-shadow 0.3s ease; border: none; }
+        .cta-button:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(240, 196, 25, 0.4); }
+        .text-gradient { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent; }
+        .membership-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .membership-card { background-color: var(--surface-color); padding: 2.5rem; border-radius: var(--border-radius); border: 1px solid rgba(255,255,255,0.1); transition: transform 0.3s ease, border-color 0.3s ease; position: relative; z-index: 1; }
+        .membership-card:hover { transform: translateY(-10px); border-color: var(--primary-color); }
+        .membership-card.vip { border: 1px solid transparent; box-shadow: 0 0 30px rgba(240, 196, 25, 0.2); overflow: hidden; }
+        .membership-card.vip::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-gradient); z-index: -1; transition: opacity 0.3s ease; }
+        .membership-card.vip .membership-content { background-color: var(--surface-color); padding: 2.5rem; height: 100%; border-radius: calc(var(--border-radius) - 2px); position: relative; z-index: 2; margin: 2px; box-sizing: border-box; width: calc(100% - 4px); height: calc(100% - 4px); }
+        .membership-card h3 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .membership-card .price { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .membership-card .price span { font-size: 1rem; font-weight: 400; color: var(--text-secondary-color); }
+        .membership-card ul { list-style: none; margin-bottom: 2rem; }
+        .membership-card li { margin-bottom: 1rem; display: flex; align-items: center; }
+        .membership-card li svg { width: 20px; height: 20px; margin-right: 10px; fill: var(--primary-color); }
+        .card-button { display: block; width: 100%; text-align: center; padding: 0.8rem 1.5rem; border: 1px solid var(--primary-color); color: var(--primary-color); background: transparent; text-decoration: none; font-weight: 500; border-radius: 50px; transition: background 0.3s ease, color 0.3s ease; }
+        .card-button:hover { background: var(--primary-gradient); color: #000; border-color: transparent; }
+        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .feature-item { display: flex; gap: 1.5rem; }
+        .feature-icon { flex-shrink: 0; width: 60px; height: 60px; background-color: var(--surface-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .feature-icon svg { width: 30px; height: 30px; fill: var(--primary-color); }
+        .feature-content h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff; }
+        .feature-content p { color: var(--text-secondary-color); }
+        .stores-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .store-card { background-color: var(--surface-color); padding: 2rem; border-radius: var(--border-radius); text-align: center; }
+        .store-card h3 { font-size: 1.2rem; margin-bottom: 1rem; }
+        .stores-grid .store-card ul { list-style-type: none; padding-left: 0; }
+        .store-card li { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; }
+        .team-member { text-align: center; }
+        .team-member .role { font-weight: 500; margin-bottom: 0.25rem; }
+        .team-member .name { font-size: 1.2rem; font-weight: 700; }
+        .finance-card { background-color: var(--surface-color); padding: 2.5rem; border-radius: var(--border-radius); max-width: 700px; margin: 0 auto; text-align: center; }
+        .finance-card h3 { margin-bottom: 1rem; }
+        .finance-card .balance { font-size: 3rem; font-weight: 700; color: #fff; margin-bottom: 1.5rem; }
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .faq-item { background-color: var(--surface-color); border-radius: var(--border-radius); margin-bottom: 1rem; overflow: hidden; }
+        .faq-question { width: 100%; background: none; border: none; padding: 1.5rem; text-align: left; font-size: 1.2rem; font-weight: 500; color: var(--text-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: color 0.3s ease; }
+        .faq-question:hover { color: var(--primary-color); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
+        .faq-answer p { padding: 0 1.5rem 1.5rem; color: var(--text-secondary-color); }
+        .faq-item.active .faq-answer { max-height: 500px; }
+        .faq-question .icon { transition: transform 0.3s ease; }
+        .faq-item.active .faq-question .icon { transform: rotate(45deg); }
+        footer { background-color: #000; padding: 4rem 0; text-align: center; z-index: 2; position: relative;}
+        .footer-logo { font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .footer-prompt { color: var(--text-secondary-color); font-size: 0.95rem; margin-bottom: 1.5rem; text-align: center; }
+        .social-links { margin-bottom: 2rem; white-space: normal; overflow-x: visible; flex-wrap: wrap; padding-bottom: 5px; display: flex; justify-content: center; align-items: center; gap: 1rem; }
+        .social-links a { margin: 0; color: var(--text-secondary-color); text-decoration: none; font-size: 1.1rem; transition: color 0.3s ease; flex-shrink: 0; position: relative; padding-bottom: 5px; }
+        .social-links a::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%) scaleX(0); width: 100%; height: 2px; background: var(--primary-gradient); transition: transform 0.3s ease-out; border-radius: 1px; }
+        .social-links a:hover::after { transform: translateX(-50%) scaleX(1); }
+        .social-links a:hover { color: var(--primary-color); }
+        .footer-copyright { color: var(--text-secondary-color); font-size: 0.9rem; }
+        .hamburger-menu { position: fixed; top: 2rem; left: 2rem; z-index: 1001; background: none; border: none; cursor: pointer; padding: 10px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
+        .hamburger-menu:hover { transform: scale(1.1); }
+        .hamburger-icon { width: 30px; height: 20px; position: relative; }
+        .hamburger-icon span { display: block; position: absolute; height: 3px; width: 100%; background: var(--primary-color); border-radius: 9px; opacity: 1; left: 0; transform: rotate(0deg); transition: .25s ease-in-out; }
+        .hamburger-icon span:nth-child(1) { top: 0px; }
+        .hamburger-icon span:nth-child(2) { top: 8px; }
+        .hamburger-icon span:nth-child(3) { top: 16px; }
+        body.sidebar-open .hamburger-icon span:nth-child(1) { top: 8px; transform: rotate(135deg); }
+        body.sidebar-open .hamburger-icon span:nth-child(2) { opacity: 0; left: -60px; }
+        body.sidebar-open .hamburger-icon span:nth-child(3) { top: 8px; transform: rotate(-135deg); }
+        .sidebar { position: fixed; top: 0; left: 0; height: 100%; width: var(--sidebar-width-desktop); background-color: var(--sidebar-bg); box-shadow: var(--shadow); transform: translateX(-100%); transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1); z-index: 1000; display: flex; flex-direction: column; padding: 2rem 0; }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.5s ease; }
+        body.sidebar-open .sidebar-overlay { opacity: 1; visibility: visible; }
+        .sidebar-nav { list-style: none; padding: 1rem 0; flex-grow: 1; }
+        .sidebar-nav li { margin-bottom: 0.5rem; }
+        .sidebar-nav a { display: block; padding: 0.8rem 2rem; color: var(--text-color); text-decoration: none; font-size: 1.1rem; font-weight: 500; border-left: 4px solid transparent; transition: background-color 0.3s ease, border-left-color 0.3s ease, opacity 0.4s ease-out, transform 0.4s ease-out; opacity: 0; transform: translateY(20px); }
+        body.sidebar-open .sidebar-nav a { opacity: 1; transform: translateY(0); transition-delay: var(--link-delay); }
+        .sidebar-nav a:hover { background-color: var(--sidebar-link-hover-bg); border-left-color: var(--primary-color); }
+        .sidebar-nav a.active-link { background-color: var(--sidebar-link-hover-bg); border-left-color: var(--primary-color); color: var(--primary-color); font-weight: 700; }
+        .sidebar-info { padding: 1rem 2rem; text-align: center; font-size: 0.85rem; color: var(--text-secondary-color); }
+        .page-content { display: none; animation: fadeIn 0.6s ease-out; }
+        .page-content.page-active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #page-menu { position: relative; }
+        #menu-overview { background-color: transparent; }
+        .menu-search-bar { margin-bottom: 3rem; position: relative; }
+        .menu-search-bar input { width: 100%; padding: 1rem 1.5rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; color: var(--text-color); font-size: 1.1rem; transition: border-color 0.3s ease, background-color 0.3s ease; background: rgba(26, 26, 26, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .menu-search-bar input:focus { outline: none; border-color: var(--primary-color); background: rgba(26, 26, 26, 0.7); }
+        .vendor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+        .vendor-card { background: rgba(26, 26, 26, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.15); transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; position: relative; overflow: hidden; cursor: pointer; display: flex; align-items: stretch; }
+        .vendor-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); border-color: var(--primary-color); }
+        .vendor-info-content { padding: 1rem 1.5rem; flex-grow: 1; text-align: left; }
+        .vendor-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .vendor-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .vendor-tag { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 50px; background-color: rgba(255,255,255,0.1); color: var(--text-secondary-color); }
+        .vendor-tag.new { background-color: rgba(240, 196, 25, 0.2); color: var(--primary-color); }
+        .vendor-tag.closed { background-color: rgba(255, 82, 82, 0.2); color: #ff5252; }
+        .vendor-action-text { writing-mode: vertical-rl; text-orientation: mixed; color: var(--text-secondary-color); font-size: 0.9rem; padding: 1rem 0.75rem; display: flex; align-items: center; justify-content: center; border-left: 1px solid rgba(255,255,255,0.1); transition: color 0.3s ease; letter-spacing: 2px; }
+        .vendor-card:hover .vendor-action-text { color: var(--primary-color); }
+        .vendor-phone { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-color); font-size: 1.1rem; padding: 0.5rem 1rem; border-radius: 50px; background-color: rgba(255,255,255,0.1); transition: background-color 0.3s ease, color 0.3s ease; }
+        .vendor-phone:hover { background-color: var(--primary-color); color: #000; }
+        .vendor-map-link { display: inline-block; text-decoration: none; color: var(--primary-color); font-weight: 500; }
+        .vendor-map-link:hover { text-decoration: underline; }
+        #dynamic-bg-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 2.5s ease-in-out; transform: scale(1.1); }
+        .bg-image.active { opacity: 0.3; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--surface-color); padding: 2.5rem; border-radius: var(--border-radius); max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid rgba(255,255,255,0.1); transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-close-btn { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-secondary-color); font-size: 2rem; line-height: 1; cursor: pointer; transition: color 0.3s ease, transform 0.3s ease; }
+        .modal-close-btn:hover { color: var(--primary-color); transform: rotate(90deg); }
+        #modal-vendor-name { font-size: 2.2rem; margin-bottom: 1rem; text-align: center; }
+        #modal-vendor-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 2rem; }
+        .modal-info { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2.5rem; }
+        .modal-section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; text-align: center; border-bottom: 2px solid var(--primary-color); display: inline-block; padding-bottom: 0.5rem; }
+        .modal-placeholder { text-align: left; color: var(--text-secondary-color); padding: 1rem; white-space: pre-wrap; background-color: rgba(0,0,0,0.2); border-radius: 8px; }
+        .modal-menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; text-align: left; }
+        .modal-menu-item { background: rgba(0,0,0,0.2); padding: 0.8rem 1rem; border-radius: 8px; display: flex; justify-content: space-between; }
+        .modal-menu-name { font-weight: 500; }
+        .modal-menu-price { color: var(--primary-color); font-weight: 700; }
+        .modal-menu-subtitle { font-size: 1.2rem; color: var(--primary-color); font-weight: 500; margin-top: 1.5rem; margin-bottom: 0.5rem; grid-column: 1 / -1; }
+        @media (max-width: 992px) { .hero h1 { font-size: 3.5rem; } .hero p { font-size: 1.2rem; } .features-grid { grid-template-columns: 1fr; } .hamburger-menu { top: 1rem; left: 1rem; } }
+        @media (max-width: 768px) { section { padding: 4rem 0; } .container { padding: 0 1rem; } .hero h1 { font-size: 2.8rem; } .hero p { font-size: 1.1rem; } .section-title { font-size: 2rem; } .membership-grid, .team-grid, .stores-grid { grid-template-columns: 1fr; } .membership-card.vip { padding: 0; } .social-links { padding-left: 0; padding-right: 0; justify-content: center; } .sidebar { width: var(--sidebar-width-mobile); } .vendor-grid { grid-template-columns: 1fr; } #modal-vendor-name { font-size: 1.8rem; } .modal-content { padding: 2rem 1.5rem; } }
+    </style>
+</head>
+<body>
+    
+    <div class="hero-background"></div>
+    <div class="sidebar-overlay"></div>
+    <nav class="sidebar" aria-label="全站導航選單"><div class="sidebar-header"><h2 class="text-gradient" style="text-align: center; font-size: 2rem; padding: 1rem 0;">外送沒人幫</h2></div><ul class="sidebar-nav"><li style="--i:1;"><a href="#" data-target="page-home" class="sidebar-link active-link">主頁</a></li><li style="--i:2;"><a href="#" data-target="page-menu" class="sidebar-link">合作店家一覽</a></li></ul><div class="sidebar-info"><p>與我們共同打造更美好的外送體驗</p><p>&copy; 2024 外送沒人幫. All Rights Reserved.</p></div></nav>
+    <button class="hamburger-menu" aria-label="開啟主選單" aria-expanded="false"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
+    <div class="page-wrapper">
+        <main>
+            <div id="page-home" class="page-content page-active">
+                <header class="hero"><div class="hero-content animate-on-scroll"><h1>外送沒人幫</h1><p>二年級，全新啟程。更優質的服務，更方便的體驗，為您而來。</p><a href="#membership" class="cta-button">開始探索</a></div></header>
+                <section id="membership"><div class="container"><div style="text-align:center;"><h2 class="section-title animate-on-scroll">會員制度</h2></div><p class="section-subtitle animate-on-scroll">下學期開始，我們將採用全新的會員制度，提供更專屬的服務。未加入會員者將無法點餐哦！</p><div class="membership-grid"><div class="membership-card animate-on-scroll"><h3 class="text-gradient">一般會員</h3><div class="price">免費</div><ul><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>擁有基本點餐資格</li><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>於指定地點（中廊）取餐</li><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>可於中午時段向幫主儲值</li></ul><a href="https://lin.ee/neuXvlH" target="_blank" class="card-button">加入官方帳號</a></div><div class="membership-card vip animate-on-scroll" style="transition-delay: 0.2s;"><div class="membership-content"><h3 class="text-gradient">VIP 會員</h3><div class="price">100<span> / 月</span></div><ul><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>享有專人送餐到班服務</li><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>當月全勤點餐，獲50元折價券</li><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>可直接向送餐員儲值，更方便</li><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>享受所有一般會員權益</li></ul><a href="https://line.me/ti/p/lCLIidT46h" target="_blank" class="card-button">洽詢幫主升級</a></div></div></div></div></section>
+                <section id="features"><div class="container"><div style="text-align:center;"><h2 class="section-title animate-on-scroll">下學期新功能</h2></div><p class="section-subtitle animate-on-scroll">為了讓點餐流程更順暢，我們推出了兩項全新功能，解決您可能遇到的問題。</p><div class="features-grid"><div class="feature-item animate-on-scroll"><div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg></div><div class="feature-content"><h3>備選店家 (🎊歐買咖🎊)</h3><p>臨時取消訂單也不怕！預先在備選店家點餐，若您取消當日訂單且未重新點餐，系統將自動為您安排備選餐點，不再餓肚子。</p></div></div><div class="feature-item animate-on-scroll" style="transition-delay: 0.2s;"><div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg></div><div class="feature-content"><h3>TimeTree 整合</h3><p>未來將導入 TimeTree 行事曆，讓您清楚預覽每週菜單，並可直接點擊行事曆內的連結前往點餐頁面，一目了然、極致方便。</p></div></div></div></section>
+                <section id="stores" style="background-color: var(--surface-color);"><div class="container"><div style="text-align:center;"><h2 class="section-title animate-on-scroll">年度票選最佳店家</h2></div><p class="section-subtitle animate-on-scroll">感謝會員們的熱情支持，這些是上學期最受歡迎的店家！也歡迎您隨時向我們推薦您的口袋名單。</p><div class="stores-grid"><div class="store-card animate-on-scroll"><h3 class="text-gradient">🍱 主餐</h3><ul><li>歐買咖</li><li>八方雲集</li><li>火雞肉飯</li></ul></div><div class="store-card animate-on-scroll" style="transition-delay: 0.2s;"><h3 class="text-gradient">🍻 飲料</h3><ul><li>ONE Week</li><li>東洲</li></ul></div><div class="store-card animate-on-scroll" style="transition-delay: 0.4s;"><h3 class="text-gradient">🆕 推薦店家</h3><ul><li>歡迎留言或私訊幫主</li></ul></div></div></div></section>
+                <section id="team"><div class="container"><div style="text-align:center;"><h2 class="section-title animate-on-scroll">核心團隊</h2></div><p class="section-subtitle animate-on-scroll">感謝所有幹部與工作人員的努力與付出，我們將持續為大家提供最好的服務。</p><div class="team-grid"><div class="team-member animate-on-scroll"><div class="role text-gradient">幫主</div><div class="name">黃彥程</div></div><div class="team-member animate-on-scroll"><div class="role text-gradient">副幫主</div><div class="name">林子嫀</div></div><div class="team-member animate-on-scroll"><div class="role text-gradient">訂餐</div><div class="name">林子嫀、賴均豪</div></div><div class="team-member animate-on-scroll"><div class="role text-gradient">領餐+表單</div><div class="name">賴均豪、陳慧如</div></div><div class="team-member animate-on-scroll"><div class="role text-gradient">送餐</div><div class="name">李芸萱、陳慧如、林子嫀</div></div><div class="team-member animate-on-scroll"><div class="role text-gradient">公關</div><div class="name">陳慧如</div></div><div class="team-member animate-on-scroll"><div class="role text-gradient">財務統計</div><div class="name">黃名葦</div></div></div></div></section>
+                <section id="finance" style="background-color: var(--surface-color);"><div class="container"><div style="text-align:center;"><h2 class="section-title animate-on-scroll">財務透明</h2></div><p class="section-subtitle animate-on-scroll">我們承諾財務公開透明，所有資金流向皆可追溯。營運金將用於支付幹部薪資與組織發展。</p><div class="finance-card animate-on-scroll"><h3 class="text-gradient">上學期公款結餘</h3><div class="balance">422 NTD</div><p class="text-secondary-color">詳細收支請至群組記事本「公款」項目查看。</p></div></div></section>
+                <section id="faq"><div class="container"><div style="text-align:center;"><h2 class="section-title animate-on-scroll">常見問答 (FAQ)</h2></div><p class="section-subtitle animate-on-scroll">有任何疑問嗎？先來這裡看看，或許能馬上找到答案。若無，歡迎隨時洽詢幫主。</p><div class="faq-container"><div class="faq-item animate-on-scroll"><button class="faq-question"><span>1. 如何點餐？</span><span class="icon">+</span></button><div class="faq-answer"><p>未來點餐將全面使用「官方帳號」貼文，您可透過以下三種方式進入點餐頁面：<br>1. 點擊群組公告的「🔵點餐⬆️」。<br>2. 點擊 TimeTree 行事曆中的貼文連結。<br>3. 直接點擊官方帳號右上角的第二個按鈕。</p></div></div><div class="faq-item animate-on-scroll"><button class="faq-question"><span>2. 如何取餐？</span><span class="icon">+</span></button><div class="faq-answer"><p><b>[一般會員]</b>: 看到群組「餐點已送達」通知後，請直接至「中廊」取餐。<br><b>[VIP會員]</b>: 我們將有專人為您將餐點直接送到教室。</p></div></div><div class="faq-item animate-on-scroll"><button class="faq-question"><span>3. 何時可以儲值？</span><span class="icon">+</span></button><div class="faq-answer"><p>儲值僅限中午取餐時段。<br><b>[一般會員]</b>: 於中廊領餐時，找幫主儲值。<br><b>[VIP會員]</b>: 可直接向送餐人員儲值。<br>提醒：儲值時可能無法找零，請盡量準備剛好的金額。多儲的金額會記錄在您的帳戶中，可隨時領出。</p></div></div></div></div></section>
+            </div>
+            <div id="page-menu" class="page-content">
+                <section id="menu-overview">
+                    <div id="dynamic-bg-container"></div>
+                    <div class="container">
+                        <div style="text-align:center;"><h2 class="section-title">合作店家一覽</h2></div>
+                        <p class="section-subtitle">點擊店家卡片查看菜單。或使用下方搜尋框快速尋找店家。</p>
+                        <div class="menu-search-bar"><input type="text" id="vendor-search" placeholder="🔍 搜尋店名、關鍵字或公休日..."></div>
+                        <div class="vendor-grid" id="vendor-grid"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <footer>
+            <div class="container"><div class="footer-logo animate-on-scroll text-gradient">外送沒人幫</div><p class="footer-prompt animate-on-scroll">歡迎加入我們的社群平台，獲取最新消息與獨家資訊！</p><div class="social-links animate-on-scroll"><a href="https://www.instagram.com/gogog_o113?igsh=MXJrYnZ2ZDlpbmozaQ==" target="_blank">IG 官方帳號</a><a href="https://line.me/R/ti/g/Pg4FRzgzU3" target="_blank">LINE 群組</a><a href="https://lin.ee/neuXvlH" target="_blank">LINE 官方帳號</a><a href="https://timetr.ee/s/f5HuiqgH_B-qanvueKE43Zg4DRbcByVB?from=copy" target="_blank">TimeTree</a><a href="https://line.me/ti/p/lCLIidT46h" target="_blank">聯絡幫主</a></div><p class="footer-copyright animate-on-scroll">© 2024 外送沒人幫. All Rights Reserved. Designed with ❤️.</p></div>
+        </footer>
+    </div>
+    <div id="vendor-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn">&times;</button>
+            <h2 id="modal-vendor-name" class="text-gradient"></h2>
+            <div id="modal-vendor-tags"></div>
+            <div class="modal-info">
+                 <a href="#" id="modal-vendor-phone" class="vendor-phone">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    <span id="modal-vendor-phone-text"></span>
+                </a>
+                <a href="#" id="modal-vendor-map" target="_blank" class="vendor-map-link" style="align-self: center;">查看地圖 &rarr;</a>
+            </div>
+            <div style="text-align: center;">
+                <h3 class="modal-section-title">店家資訊</h3>
+                <p id="modal-vendor-info" class="modal-placeholder"></p>
+            </div>
+             <div style="text-align: center; margin-top: 1.5rem;">
+                <h3 class="modal-section-title">菜單</h3>
+                <div id="modal-vendor-menu"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } }); }, { threshold: 0.1 });
+        const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+        elementsToAnimate.forEach(el => observer.observe(el));
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => { const question = item.querySelector('.faq-question'); question.addEventListener('click', () => { const isActive = item.classList.contains('active'); faqItems.forEach(otherItem => { if (otherItem !== item) { otherItem.classList.remove('active'); } }); if (isActive) { item.classList.remove('active'); } else { item.classList.add('active'); } }); });
+        const vipCard = document.querySelector('.membership-card.vip');
+        if (vipCard) { const content = vipCard.innerHTML; vipCard.innerHTML = ''; const contentWrapper = document.createElement('div'); contentWrapper.className = 'membership-content'; contentWrapper.innerHTML = content; vipCard.appendChild(contentWrapper); }
+        
+        const hamburgerButton = document.querySelector('.hamburger-menu');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.querySelector('.sidebar-overlay');
+        const sidebarLinks = document.querySelectorAll('.sidebar-nav a.sidebar-link');
+        const body = document.body;
+        const pages = document.querySelectorAll('.page-content');
+        const heroBackground = document.querySelector('.hero-background');
+        const menuBackgroundContainer = document.getElementById('dynamic-bg-container');
+
+        function toggleSidebar() { body.classList.toggle('sidebar-open'); const isExpanded = body.classList.contains('sidebar-open'); hamburgerButton.setAttribute('aria-expanded', isExpanded); sidebarLinks.forEach((link, index) => { link.style.setProperty('--link-delay', `${index * 0.05 + 0.2}s`); }); }
+        
+        function switchPage(targetId) {
+            const targetPage = document.getElementById(targetId);
+            if (!targetPage) return;
+            pages.forEach(p => p.classList.remove('page-active'));
+            targetPage.classList.add('page-active');
+            window.scrollTo(0, 0);
+            sidebarLinks.forEach(l => { l.classList.toggle('active-link', l.dataset.target === targetId); });
+
+            if (targetId === 'page-home') {
+                heroBackground.style.display = 'block';
+                menuBackgroundContainer.style.display = 'none';
+            } else if (targetId === 'page-menu') {
+                heroBackground.style.display = 'none';
+                menuBackgroundContainer.style.display = 'block';
+                initDynamicBackground();
+            } else {
+                heroBackground.style.display = 'none';
+                menuBackgroundContainer.style.display = 'none';
+            }
+        }
+        
+        hamburgerButton.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+        sidebarLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const targetId = link.dataset.target; switchPage(targetId); if (body.classList.contains('sidebar-open')) { toggleSidebar(); } }); });
+        
+        const vendorData = [
+            // 您提供的詳細店家資料
+            { name: "歐賣咖", displayName: "歐賣咖 咖哩工坊", phone: "073806973", address: "高雄市三民區正興路82號", info: "營業時間:\n上午 11:00 ~ 下午 14:00\n下午 17:00 ~ 晚上 20:30\n\n外送資訊: 滿5-10份餐點可外送 (視路程)", tags: ["咖哩", "義大利麵", "鍋燒"], menu: [ { type: 'subtitle', text: '咖哩蛋包飯 (加大+10元 / 焗烤+30元)' }, { name: '原味', price: 70 }, { name: '雞排', price: 90 }, { name: '魚排', price: 90 }, { name: '花枝排', price: 90 }, { name: '豬肉', price: 95 }, { name: '雞腿丁', price: 95 }, { name: '海鮮總匯', price: 95 }, { name: '卡滋豬排', price: 100 }, { name: '脆皮雞腿', price: 100 }, { name: '牛肉', price: 110 }, { name: '炸蝦X3', price: 145 }, { name: '唐揚雞', price: 150 }, { name: '酥炸魷魚', price: 160 }, { type: 'subtitle', text: '咖哩拌麵 (加大+20元)' }, { name: '原味', price: 80 }, { name: '雞排', price: 110 }, { name: '魚排', price: 110 }, { name: '花枝排', price: 110 }, { name: '豬肉', price: 110 }, { name: '雞腿丁', price: 110 }, { name: '海鮮總匯', price: 110 }, { name: '卡滋豬排', price: 120 }, { name: '脆皮雞腿', price: 120 }, { name: '牛肉', price: 130 }, { name: '炸蝦X3', price: 165 }, { name: '唐揚雞', price: 170 }, { name: '酥炸魷魚', price: 180 }, { type: 'subtitle', text: '義大利麵 (白醬/紅醬/青醬+10元/換焗飯+20元)' }, { name: '原味', price: 70 }, { name: '雞排', price: 105 }, { name: '魚排', price: 105 }, { name: '花枝排', price: 105 }, { name: '豬肉', price: 105 }, { name: '雞腿丁', price: 105 }, { name: '蛤蜊', price: 105 }, { name: '豬排', price: 110 }, { name: '雞腿', price: 110 }, { name: '牛肉', price: 120 }, { name: '肉醬', price: 100 }, { name: '炸蝦X3', price: 145 }, { name: '唐揚雞', price: 150 }, { name: '酥炸魷魚', price: 160 }, { type: 'subtitle', text: '鍋燒系列' }, { name: '意麵/雞絲麵/冬粉/鍋燒粥', price: 90 }, { name: '烏龍麵', price: 100 }, { name: '麻婆豆腐燴飯', price: 85 }, { type: 'subtitle', text: '丼飯' }, { name: '親子丼', price: 100 }, { name: '豬肉丼', price: 100 }, { name: '豬排丼', price: 100 }, { name: '牛肉丼', price: 110 }, { name: '炸蝦丼', price: 140 }, { type: 'subtitle', text: '單點類' }, { name: '酥炸魷魚', price: 120 }, { name: '黃金炸蝦 (3支)', price: 120 }, { name: '唐揚雞', price: 120 }, { name: '骰子雞', price: 60 }, { name: '雞排', price: 55 }, { name: '豬排', price: 55 }, { name: '雞腿', price: 55 }, { name: '黃金脆薯', price: 40 }, { name: '起士', price: 60 }, { name: '竹輪', price: 40 }, { name: '豆腐', price: 60 }, { name: '德式香腸 (1支)', price: 30 }, { type: 'subtitle', text: '湯品/小菜' }, { name: '黃金泡菜/韓式泡菜', price: 40 }, { name: '玉米濃湯/味噌湯', price: 20 }, { name: '小菜一份', price: 30 } ] },
+            { name: "感丼現食", displayName: "感丼現食 文衡店", phone: "077405810", address: "高雄市鳳山區文衡路11號", info: "營業時間: 11:00 - 21:00\n外送資訊: 滿300元可外送\n備註: 早上9點起可電話訂餐；團體訂購可洽官方LINE。", tags: ["丼飯", "LINE點餐", "closed:週日公休"], menu: [ { type: 'subtitle', text: '日式醬燒丼 (可選: 飯/乾拌麵/湯麵/乾拌烏龍/湯烏龍)' }, { name: '方便素', price: '80/100/100' }, { name: '豬肉', price: '95/115/115' }, { name: '牛肉', price: '100/120/120' }, { name: '厚切雞腿', price: '140/160/160' }, { name: '板腱牛排', price: '180/200/200' }, { name: '櫻桃鴨胸', price: '200/220/220' }, { name: '隱藏版', price: '250/270/270' }, { type: 'subtitle', text: '韓式辣醬丼 (可選: 飯/乾拌麵/湯麵)' }, { name: '方便素', price: '85/105' }, { name: '豬肉', price: '100/120' }, { name: '牛肉', price: '105/125' }, { name: '厚切雞腿', price: '150/170' }, { type: 'subtitle', text: '義式白醬丼 (可選: 飯/乾拌麵/湯麵/乾拌烏龍/湯烏龍)' }, { name: '方便素', price: '85/105/105' }, { name: '豬肉', price: '100/120/120' }, { name: '牛肉', price: '105/125/125' }, { name: '厚切雞腿', price: '150/170/170' }, { name: '板腱牛排', price: '190/210/210' }, { name: '櫻桃鴨胸', price: '210/230/230' }, { type: 'subtitle', text: '加料' }, { name: '松露醬', price: 30 }, { name: '日式醬燒/黃金泡菜/起士片', price: 5 }, { type: 'subtitle', text: '單點小菜' }, { name: '煎小干貝(3顆)', price: 45 }, { name: '櫛瓜', price: 45 }, { name: '日本山藥', price: 65 }, { name: '嫩雞蛋豆腐', price: 40 }, { name: '黑輪片', price: 35 }, { name: '黃金泡菜', price: 35 }, { name: '溏心蛋/溫泉蛋', price: 25 }, { name: '起士抓餅', price: 50 }, { name: '蔥抓餅', price: 35 }, { name: '嫩牛筋', price: 50 }, { name: '厚切去骨雞腿', price: 100 }, { name: '板腱牛排', price: 130 }, { name: '櫻桃鴨胸', price: 150 }, { type: 'subtitle', text: '湯品.飲品' }, { name: '雞白湯(無料)/紫菜蛋花湯', price: 30 }, { name: '韓式嫩豆腐湯', price: 40 }, { name: '泰式奶茶', price: 70 }, { name: '蘋果綠茶', price: 60 } ] },
+            { name: "小魯魯", phone: "077415470", address: "高雄市鳳山區維新路60號", info: "營業時間: 週日公休 (預訂時間早上9點起)\n備註: 麻醬、沙茶加量+10元。", tags: ["鴨肉飯", "closed:週日公休"], menu: [ { type: 'subtitle', text: '飯/麵類' }, { name: '鴨肉意麵', price: '小50/大65' }, { name: '鴨肉冬粉', price: 60 }, { name: '鴨肉飯', price: 55 }, { name: '燒肉飯/麵', price: '小60/大70' }, { name: '雞絲飯/麵', price: '小35/大40' }, { name: '麻油麵線', price: 50 }, { name: '麻醬麵', price: 50 }, { name: '餛飩麵', price: 60 }, { name: '豬舌冬粉', price: 50 }, { name: '肉絲/海產/什錦炒飯/麵', price: '60-70' }, { name: '炒米粉/粄條', price: 60 }, { name: '青燥飯', price: 30 }, { type: 'subtitle', text: '湯品/其他' }, { name: '骨仔肉湯', price: 40 }, { name: '吳郭魚湯', price: 55 }, { name: '蛤仔湯', price: 40 }, { name: '豬肝湯', price: 30 }, { name: '貢丸湯', price: 30 }, { name: '海鮮湯', price: 60 }, { name: '虱目魚湯', price: 60 }, { name: '水餃(每顆)', price: 5 } ] },
+            { name: "小宜的店", displayName: "小宜的店 (小目鍋燒)", phone: "0985446509", address: "高雄市鳳山區經武路285號", info: "備註: 加飯/麵/蛋 +10元。", tags: ["鍋燒", "粥"], menu: [ { type: 'subtitle', text: '鍋燒類' }, { name: '鍋燒(意麵/雞絲/烏龍/冬粉/王子)', price: 75 }, { name: '韓式泡菜鍋燒', price: 85 }, { name: '味噌拉麵', price: 85 }, { name: '起士鍋燒', price: 85 }, { name: '丸餃鍋', price: 90 }, { type: 'subtitle', text: '粥類' }, { name: '海產粥/魚肉粥/蛤仔粥/蝦仁粥', price: 75 }, { name: '味噌泡飯', price: 85 }, { name: '魚肚粥', price: 95 }, { type: 'subtitle', text: '湯類' }, { name: '蛤仔湯/海產湯/魚肉湯', price: 50 }, { name: '魚肚湯', price: 85 }, { name: '魚丸湯', price: 30 }, { name: '蛋花湯', price: 35 } ] },
+            { name: "八方雲集", displayName: "八方雲集 高雄鳳山青年店", phone: "077461237", address: "高雄市鳳山區青年路二段381號", info: "此為綜合多張點單的資訊整理。", tags: ["水餃", "鍋貼", "麵食"], menu: [ { type: 'subtitle', text: '鍋貼/水餃 (每顆)' }, { name: '招牌/韭菜/韓式辣味/咖哩雞肉/玉米', price: 7 }, { name: '薪蔬食', price: 7.5 }, { name: '鮮蝦水餃', price: 10.5 }, { type: 'subtitle', text: '麵食系列' }, { name: '紅燒牛肉麵/清燉牛肉麵', price: 168 }, { name: '金牌麻辣牛肉乾拌麵', price: 178 }, { name: '旗艦海陸湯麵', price: 125 }, { name: '酸辣湯麵', price: 68 }, { name: '麻醬乾麵', price: 60 }, { name: '紹辣乾麵', price: 58 }, { name: '招牌乾麵', price: 55 }, { name: '古早味乾麵', price: 45 }, { type: 'subtitle', text: '湯品/抄手' }, { name: '酸辣湯/旗艦濃湯/蕈菇濃湯', price: 35 }, { name: '玉米濃湯', price: 30 }, { name: '招牌抄手/紅油抄手', price: 60 }, { name: '鮮蝦抄手', price: 80 }, { type: 'subtitle', text: '小菜/飲品' }, { name: '和風秋葵/胡麻豆干絲/滷蛋/燙青菜', price: '30-40' }, { name: '豆漿/無糖豆漿', price: 20 }, { name: '紅茶/奶茶/特濃豆漿', price: 25 } ] },
+            { name: "關東煮", phone: "無", address: "鳳山體育館周邊", info: "攤販，無確切地址與電話。此為個人整理價目表。", tags: ["關東煮", "鍋燒", "麵食"], menu: [ { type: 'subtitle', text: '關東煮類' }, { name: '高麗菜/百頁/米血/黑輪/菜頭/豆皮/豆干/空心菜/蒸煮麵/意麵/拉麵', price: 20 }, { name: '龍蝦棒/雞絲麵', price: 15 }, { name: '金針菇/秀珍菇/鱈魚丸(2)/黃金魚蛋(2)/貢丸(2)/竹輪/魚丸串/花枝串', price: 10 }, { name: '凍豆腐', price: 5 }, { name: '高麗菜捲/讚岐烏龍麵/韓式拉麵', price: 30 }, { name: '杏包菇', price: 40 }, { name: '肉片', price: 35 }, { type: 'subtitle', text: '麵食/其他' }, { name: '乾麵', price: '小35/大45' }, { name: '鍋燒系列 (加麵+10)', price: '小65/大70' }, { name: '麻醬麵', price: 40 }, { name: '麻辣牛肉(乾/湯/烏龍) (加麵/飯+10)', price: 95 }, { name: '奶油白醬培根麵', price: 85 }, { name: '烤黑輪片(每片)', price: 30 }, { name: '大腸包小腸', price: 75 }, { name: '香腸', price: 35 }, { name: '大腸', price: 50 }, { name: '綜合滷味', price: '小75/大80' } ] },
+            
+            // 我補充搜尋的店家資料
+            { name: "39焗烤家族", phone: "077778883", address: "高雄市鳳山區八德路二段260號", info: "週二公休", tags: ["焗烤", "closed:週二公休"], menu: [] },
+            { name: "昭和炒飯", phone: "077228585", address: "高雄市苓雅區廣州一街141-5號", info: "店家位於苓雅區，請確認外送範圍。", tags: ["炒飯"], menu: [] },
+            { name: "何媽媽鍋燒丼飯炒飯", phone: "077263740", address: "高雄市苓雅區福德三路269號", info: "店家位於苓雅區，請確認外送範圍。", tags: ["鍋燒", "丼飯", "炒飯"], menu: [] },
+            { name: "吳爸便當", phone: "077775102", address: "高雄市鳳山區南華路201號", info: "週日公休", tags: ["便當", "closed:週日公休"], menu: [] },
+            { name: "陳麻飯", phone: "077778751", address: "高雄市鳳山區光復路一段81號", info: "週六公休", tags: ["飯", "closed:週六公休"], menu: [] },
+            { name: "老闆不夠辣", phone: "077998855", address: "高雄市鳳山區文衡路532號", info: "", tags: ["麵食", "小菜"], menu: [] },
+            { name: "華新牛排", phone: "077433522", address: "高雄市鳳山區中山路149-5號", info: "", tags: ["牛排"], menu: [] },
+            { name: "奇奇蚵仔煎", phone: "077905029", address: "高雄市鳳山區瑞興路86號", info: "", tags: ["蚵仔煎"], menu: [] },
+            { name: "食扒穗", phone: "077801250", address: "高雄市大寮區鳳林三路492號", info: "店家位於大寮區，請確認外送範圍。", tags: ["複合式"], menu: [] },
+            { name: "嘉義火雞肉飯", phone: "077474905", address: "高雄市鳳山區中華街48-1號", info: "", tags: ["飯"], menu: [] },
+            { name: "手作??", displayName: "手作功夫茶-高醫店?", phone: "073220885", address: "高雄市三民區自由一路99號", info: "店名不確定，請確認是否為此店家及外送範圍", tags: ["飲料"], menu: [] },
+            { name: "山內村", phone: "073963077", address: "高雄市三民區山東街117號", info: "店家位於三民區，請確認外送範圍。週二公休", tags: ["closed:週二公休"], menu: [] },
+            { name: "曉食記", phone: "077103838", address: "高雄市鳳山區八德路二段212巷2號", info: "週一公休", tags: ["早午餐", "closed:週一公休"], menu: [] },
+            { name: "鳳城老牌米糕", phone: "0901307180", address: "高雄市鳳山區中華街40號", info: "", tags: ["米糕"], menu: [] },
+            { name: "西貢河粉", phone: "077990014", address: "高雄市鳳山區自由路156號", info: "", tags: ["河粉"], menu: [] },
+            { name: "一翻馫", phone: "0976667183", address: "高雄市鳳山區體育路35號", info: "週日公休", tags: ["飯糰", "closed:週日公休"], menu: [] },
+            { name: "高大早點", phone: "077479869", address: "高雄市鳳山區光遠路279巷1號", info: "", tags: ["早餐"], menu: [] },
+            { name: "夏目鐵板燒", phone: "0925388050", address: "高雄市鳳山區五甲一路12號", info: "", tags: ["鐵板燒"], menu: [] },
+            { name: "Chai&Tina", phone: "077408206", address: "高雄市鳳山區文衡路491號", info: "週一公休", tags: ["new", "closed:週一公休", "咖啡"], menu: [] },
+            { name: "大咖", phone: "077406399", address: "高雄市鳳山區光遠路303號", info: "", tags: ["new", "飲料"], menu: [] },
+            { name: "良食", phone: "077667271", address: "高雄市鳳山區五甲三路75號", info: "週日公休", tags: ["new", "輕食", "closed:週日公休"], menu: [] },
+            { name: "甲一飯包", displayName: "甲一飯包 鳳山店", phone: "077261685", address: "高雄市鳳山區瑞隆東路60號", info: "週日公休", tags: ["new", "飯包", "closed:週日公休"], menu: [] },
+            { name: "池上飯盒", displayName: "池上飯盒 鳳山經武店", phone: "077658052", address: "高雄市鳳山區經武路67號", info: "", tags: ["new", "飯盒"], menu: [] },
+            { name: "鍋燒堂", phone: "077752322", address: "高雄市鳳山區中山東路79-1號", info: "", tags: ["new", "鍋燒"], menu: [] },
+            { name: "南啵炒飯", phone: "077223704", address: "高雄市苓雅區福德三路342號", info: "店家位於苓雅區，請確認外送範圍。", tags: ["new", "炒飯"], menu: [] },
+            { name: "太師傅", displayName: "太師傅便當-鳳山青年店", phone: "077218852", address: "高雄市鳳山區青年路二段497號", info: "", tags: ["new", "便當"], menu: [] },
+            { name: "梅家村排骨飯", displayName: "梅家村排骨飯 鳳山店", phone: "077990002", address: "高雄市鳳山區中山路81號", info: "", tags: ["new", "飯"], menu: [] },
+            { name: "成峰便當", phone: "077481919", address: "高雄市鳳山區中山西路238號", info: "", tags: ["new", "便當"], menu: [] },
+            { name: "豚將拉麵", displayName: "豚將拉麵 鳳山光遠店", phone: "077210485", address: "高雄市鳳山區光遠路87號", info: "週一公休", tags: ["new", "拉麵", "closed:週一公休"], menu: [] },
+            { name: "麥圓多", phone: "077218689", address: "高雄市苓雅區武廟路135巷7號", info: "店家位於苓雅區，請確認外送範圍。", tags: ["new", "早午餐"], menu: [] },
+            { name: "三記港式燒臘", phone: "077632383", address: "高雄市鳳山區五甲三路13號", info: "", tags: ["new", "燒臘"], menu: [] },
+            { name: "也竹咖哩", phone: "077672116", address: "高雄市鳳山區五甲一路96號", info: "週日公休", tags: ["new", "咖哩", "closed:週日公休"], menu: [] },
+            { name: "桌上賓", displayName: "桌上賓會議餐盒-高雄", phone: "077216172", address: "高雄市苓雅區福德一路89號", info: "店家位於苓雅區，請確認外送範圍。", tags: ["new", "便當"], menu: [] },
+            { name: "新百齡", phone: "077611199", address: "高雄市鳳山區五甲二路466號", info: "", tags: ["new", "排骨飯"], menu: [] },
+        ];
+        
+        const vendorGrid = document.getElementById('vendor-grid');
+        const searchInput = document.getElementById('vendor-search');
+        function renderVendors(filter = '') {
+            vendorGrid.innerHTML = '';
+            const lowerCaseFilter = filter.toLowerCase();
+            const filteredData = vendorData.filter(vendor => {
+                const nameMatch = (vendor.displayName || vendor.name).toLowerCase().includes(lowerCaseFilter);
+                const tagMatch = vendor.tags.some(tag => tag.toLowerCase().includes(lowerCaseFilter));
+                return nameMatch || tagMatch;
+            });
+            if (filteredData.length === 0) { vendorGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary-color);">找不到符合條件的店家...</p>`; return; }
+            filteredData.forEach(vendor => {
+                const card = document.createElement('div');
+                card.className = 'vendor-card';
+                card.dataset.vendorName = vendor.name;
+                let tagsHTML = '';
+                vendor.tags.forEach(tag => {
+                    let className = 'vendor-tag';
+                    let tagText = tag;
+                    if (tag.startsWith('new')) { className += ' new'; tagText = '新店家'; }
+                    else if (tag.startsWith('closed:')) { className += ' closed'; tagText = tag.replace('closed:', ''); }
+                    tagsHTML += `<span class="${className}">${tagText}</span>`;
+                });
+                card.innerHTML = `
+                    <div class="vendor-info-content">
+                        <h3 class="vendor-name">${vendor.displayName || vendor.name}</h3>
+                        <div class="vendor-tags">${tagsHTML}</div>
+                    </div>
+                    <div class="vendor-action-text">點擊查看菜單</div>`;
+                vendorGrid.appendChild(card);
+            });
+        }
+        const modal = document.getElementById('vendor-modal');
+        const modalCloseBtn = document.querySelector('.modal-close-btn');
+        function openModal() { modal.classList.add('active'); body.classList.add('modal-open'); }
+        function closeModal() { modal.classList.remove('active'); body.classList.remove('modal-open'); }
+        function populateAndShowModal(vendorName) {
+            const vendor = vendorData.find(v => v.name === vendorName);
+            if (!vendor) return;
+            document.getElementById('modal-vendor-name').textContent = vendor.displayName || vendor.name;
+            document.getElementById('modal-vendor-phone').href = `tel:${vendor.phone}`;
+            document.getElementById('modal-vendor-phone-text').textContent = vendor.phone;
+            document.getElementById('modal-vendor-map').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(vendor.address || '高雄 ' + (vendor.displayName || vendor.name))}`;
+            const tagsContainer = document.getElementById('modal-vendor-tags');
+            tagsContainer.innerHTML = '';
+            vendor.tags.forEach(tag => {
+                let className = 'vendor-tag';
+                let tagText = tag;
+                if (tag.startsWith('new')) { className += ' new'; tagText = '新店家'; }
+                else if (tag.startsWith('closed:')) { className += ' closed'; tagText = tag.replace('closed:', ''); }
+                tagsContainer.innerHTML += `<span class="${className}">${tagText}</span>`;
+            });
+            const infoContainer = document.getElementById('modal-vendor-info');
+            infoContainer.textContent = vendor.info || '無';
+            const menuContainer = document.getElementById('modal-vendor-menu');
+            if (vendor.menu && vendor.menu.length > 0) {
+                menuContainer.className = 'modal-menu-grid';
+                menuContainer.innerHTML = '';
+                vendor.menu.forEach(item => {
+                    if (item.type === 'subtitle') {
+                        menuContainer.innerHTML += `<h4 class="modal-menu-subtitle">${item.text}</h4>`;
+                    } else {
+                        const price = typeof item.price === 'number' ? `$${item.price}` : (item.price === undefined ? '' : `$${item.price}`);
+                        menuContainer.innerHTML += `<div class="modal-menu-item"><span class="modal-menu-name">${item.name}</span><span class="modal-menu-price">${price}</span></div>`;
+                    }
+                });
+            } else {
+                menuContainer.className = 'modal-placeholder';
+                menuContainer.innerHTML = '菜單資訊準備中...';
+            }
+            openModal();
+        }
+        vendorGrid.addEventListener('click', (e) => { const card = e.target.closest('.vendor-card'); if (card) { populateAndShowModal(card.dataset.vendorName); } });
+        modalCloseBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) { closeModal(); } });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderVendors();
+            searchInput.addEventListener('input', (e) => renderVendors(e.target.value));
+            switchPage('page-home'); 
+        });
+
+        function initDynamicBackground() { const bgContainer = document.getElementById('dynamic-bg-container'); if(!bgContainer || bgContainer.childElementCount > 0) return; const images = [ 'https://images.unsplash.com/photo-1512152272829-e3139592d56f?q=80&w=2940&auto=format&fit=crop', 'https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=2864&auto=format&fit=crop', 'https://images.unsplash.com/photo-1562967915-92ae0c320a01?q=80&w=2787&auto=format&fit=crop', 'https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=2940&auto=format&fit=crop', 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2940&auto=format&fit=crop', 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2940&auto=format&fit=crop', 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=2864&auto=format&fit=crop', 'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?q=80&w=2940&auto=format&fit=crop' ]; images.forEach(src => { new Image().src = src; }); images.forEach((src) => { const div = document.createElement('div'); div.className = 'bg-image'; div.style.backgroundImage = `url(${src})`; bgContainer.appendChild(div); }); const bgImages = bgContainer.querySelectorAll('.bg-image'); let currentIndex = 0; function changeBackground() { bgImages.forEach(img => img.classList.remove('active')); bgImages[currentIndex].classList.add('active'); currentIndex = (currentIndex + 1) % bgImages.length; } changeBackground(); setInterval(changeBackground, 7000); }
+    </script>
+</body>
+</html>
